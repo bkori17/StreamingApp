@@ -1,6 +1,20 @@
 pipeline {
     agent any
 
+    parameters {
+        password(
+            name: 'AWS_ACCESS_KEY_ID',
+            defaultValue: '',
+            description: 'AWS Access Key ID'
+        )
+
+        password(
+            name: 'AWS_SECRET_ACCESS_KEY',
+            defaultValue: '',
+            description: 'AWS Secret Access Key'
+        )
+    }
+
     environment {
         AWS_REGION = 'ap-south-1'
         AWS_ACCOUNT_ID = '378494867940'
@@ -9,6 +23,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -17,16 +32,14 @@ pipeline {
 
         stage('ECR Login') {
             steps {
-                withCredentials([
-                    string(credentialsId: 'aws-access-key-id',
-                           variable: 'AWS_ACCESS_KEY_ID'),
-                    string(credentialsId: 'aws-secret-access-key',
-                           variable: 'AWS_SECRET_ACCESS_KEY')
+                withEnv([
+                    "AWS_ACCESS_KEY_ID=${params.AWS_ACCESS_KEY_ID}",
+                    "AWS_SECRET_ACCESS_KEY=${params.AWS_SECRET_ACCESS_KEY}"
                 ]) {
                     sh '''
-                      aws ecr get-login-password --region $AWS_REGION |
-                      docker login --username AWS \
-                      --password-stdin $ECR_REGISTRY
+                    aws ecr get-login-password --region $AWS_REGION | \
+                    docker login --username AWS \
+                    --password-stdin $ECR_REGISTRY
                     '''
                 }
             }
@@ -56,11 +69,11 @@ pipeline {
                 sh '''
                 for svc in auth stream admin chat frontend
                 do
-                  docker tag streaming-$svc:$IMAGE_TAG \
-                  $ECR_REGISTRY/streaming-$svc:$IMAGE_TAG
+                    docker tag streaming-$svc:$IMAGE_TAG \
+                    $ECR_REGISTRY/streaming-$svc:$IMAGE_TAG
 
-                  docker push \
-                  $ECR_REGISTRY/streaming-$svc:$IMAGE_TAG
+                    docker push \
+                    $ECR_REGISTRY/streaming-$svc:$IMAGE_TAG
                 done
                 '''
             }
@@ -71,6 +84,7 @@ pipeline {
         success {
             echo 'StreamingApp build and ECR push successful'
         }
+
         failure {
             echo 'StreamingApp pipeline failed'
         }
