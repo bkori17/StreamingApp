@@ -4,7 +4,8 @@ Project: StreamingApp – Container Orchestration and Scaling
 Student: Basavaraj Kori
 
 GitHub Repository:
-https://github.com/bkori17/StreamingApp
+https://github.com/bkori17/StreamingApp.git
+
 
 The repository contains the application source, Docker configuration,
  Jenkins CI pipeline, Amazon ECR integration, EKS/Kubernetes and Helm configuration,
