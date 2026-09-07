@@ -1,0 +1,50 @@
+services:
+
+  auth:
+    image: 378494867940.dkr.ecr.ap-south-1.amazonaws.com/streaming-auth
+    tag: "1.0.0"
+    replicas: 2
+    port: 3001
+
+  streaming:
+    image: 378494867940.dkr.ecr.ap-south-1.amazonaws.com/streaming-stream
+    tag: "1.0.0"
+    replicas: 2
+    port: 3002
+
+  admin:
+    image: 378494867940.dkr.ecr.ap-south-1.amazonaws.com/streaming-admin
+    tag: "1.0.0"
+    replicas: 2
+    port: 3003
+
+  chat:
+    image: 378494867940.dkr.ecr.ap-south-1.amazonaws.com/streaming-chat
+    tag: "1.0.0"
+    replicas: 2
+    port: 3004
+
+  frontend:
+    image: 378494867940.dkr.ecr.ap-south-1.amazonaws.com/streaming-frontend
+    tag: "1.0.0"
+    replicas: 2
+    port: 80
+
+mongo:
+  image: mongo:7
+  port: 27017
+  database: streamingapp
+  storageSize: 5Gi
+
+config:
+  awsRegion: ap-south-1
+  clientUrls: "http://streamingapp.local"
+
+secrets:
+  jwtSecret: "CHANGE-ME"
+  awsAccessKeyId: ""
+  awsSecretAccessKey: ""
+
+ingress:
+  enabled: true
+  host: streamingapp.local
